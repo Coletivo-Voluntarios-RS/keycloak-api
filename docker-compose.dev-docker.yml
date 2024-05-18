@@ -1,0 +1,36 @@
+version: '3.8'
+
+networks:
+  sos-network:
+    external: 
+      name: sos-network
+
+volumes:
+  keycloak-dev-data:
+
+services:
+  auth-api:
+    container_name: keycloak-dev
+    image: quay.io/keycloak/keycloak:24.0
+    restart: always
+    command:
+      - start-dev
+      - --import-realm
+    ports:
+      - 8090:8090
+    networks:
+      - sos-network
+    volumes:
+      - keycloak-dev-data:/opt/keycloak/data
+      - ./resources/keycloak/realm-sos.json:/opt/keycloak/data/import/realm-export.json
+    environment:
+      - KC_HTTP_PORT=8090
+      - KC_HOSTNAME=auth-api
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL_HOST=auth-database
+      - KC_DB_URL_PORT=5433
+      - KC_DB_URL_DATABASE=auth
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=postgres
